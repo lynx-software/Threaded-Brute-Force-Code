@@ -1,0 +1,27 @@
+global const char CHARACTER_SET[] = all lowercase letters
+global const int MAX_CHARACTERS = 6
+
+class ThreadT {
+    public:
+	ThreadT(start, end)
+	string BruteForcePassword()
+    private:
+	int startChar;
+	int endChar;
+}
+
+CreateThreads()
+
+- interpret command line arguments, get thread amount
+- split search space between threads
+- each thread brute-forces through its search space
+	- create array of 6 numbers
+	- first = startChar
+	- convert into string
+	- encrypt string
+	- if encrypted string == hash:
+		- return string
+	- if array[0] == endChar and all others are the last character in the character set:
+		- return null string
+
+- output time for computation (in file, use units)
