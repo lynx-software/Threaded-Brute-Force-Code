@@ -25,3 +25,8 @@ CreateThreads()
 		- return null string
 
 - output time for computation (in file, use units)
+
+Increment Search:
+while search = true:
+  for i < length of array:
+	

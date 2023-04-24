@@ -15,14 +15,16 @@ const string encryptedPassword = "DBtH8T8yNcN0U";
 const char CHARACTER_SET[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 const int MAX_CHARACTERS = 6;
 
-struct SearchSpaceT {
-    int startCharIndex;
-    int endCharIndex;
+class SearchSpaceT {
+    public:
+        string BruteForcePassword();
+    private:
+        int startCharIndex;
+        int endCharIndex;
 };
 
 int GetCmdLineArgs(int argc, char * argv[]);
 string IntArrayToString(int indexArray[]);
-string BruteForcePassword(SearchSpaceT search);
 
 int main(int argc, char * argv[]) {
     int n = GetCmdLineArgs(argc, argv);
@@ -49,19 +51,24 @@ string IntArrayToString(int indexArray[]) {
     return builtString;
 }
 
-string BruteForcePassword(SearchSpaceT search) {
-    int charIndexArray[MAX_CHARACTERS] = {search.startCharIndex, 0, 0, 0, 0, 0};
+string SearchSpaceT::BruteForcePassword() {
+    int charIndexArray[MAX_CHARACTERS] = {startCharIndex, 0, 0, 0, 0, 0};
     string stringFromArray;
     string encryptedString;
     string salt = "DB";
+    int start = startCharIndex;
     crypt_data data;
 
-    while (charIndexArray[0] <= search.endCharIndex) {
+    while (charIndexArray[0] <= endCharIndex) {
         stringFromArray = IntArrayToString(charIndexArray);
         encryptedString = crypt_r(stringFromArray.c_str(), salt.c_str(), data);
+
         if (encryptedString == encryptedPassword) {
             return stringFromArray;
         }
+        
+        // increment search
+        
     }
     return "";
 }
