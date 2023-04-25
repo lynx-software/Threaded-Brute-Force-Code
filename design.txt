@@ -27,6 +27,10 @@ CreateThreads()
 - output time for computation (in file, use units)
 
 Increment Search:
-while search = true:
-  for i < length of array:
-	
+if first character == endchar:
+  increment = true
+  i = 1
+while increment = true and i < length of array:
+  if array[i] != last possible character:
+	search = false
+  i++

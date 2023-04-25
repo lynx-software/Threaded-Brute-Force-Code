@@ -60,17 +60,37 @@ string SearchSpaceT::BruteForcePassword() {
     string salt = "DB";
     int start = startCharIndex;
     crypt_data data;
+    int i = MAX_CHARACTERS - 1;
+    bool incremented;
+
+    data.initialized = 0;
 
     while (charIndexArray[0] <= endCharIndex) {
         stringFromArray = IntArrayToString(charIndexArray);
-        encryptedString = crypt_r(stringFromArray.c_str(), salt.c_str(), &data);
+        crypt_r(stringFromArray.c_str(), salt.c_str(), &data);
+        encryptedString = data.output;
 
         if (encryptedString == encryptedPassword) {
             return stringFromArray;
         }
         
         // increment search
-        
+        if (charIndexArray[MAX_CHARACTERS - 1] == 25) {
+            while (i >= 0 and !incremented) {
+                if (charIndexArray[i] != 25) {
+                    charIndexArray[i] += 1;
+                    incremented = true;
+                }
+                i--;
+            }
+            // max search value reached
+            if (!incremented) {
+                charIndexArray[0] = endCharIndex + 1;
+            }
+        } else {
+            charIndexArray[MAX_CHARACTERS - 1] += 1;
+        }
     }
+
     return "";
 }
