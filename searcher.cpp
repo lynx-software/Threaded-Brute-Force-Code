@@ -6,7 +6,9 @@
 
 #include <iostream>
 #include <crypt.h> // encryption
-// #include <thread>
+#include <thread>
+#include <string.h>
+#include <cassert>
 
 using namespace std;
 
@@ -61,7 +63,7 @@ string SearchSpaceT::BruteForcePassword() {
 
     while (charIndexArray[0] <= endCharIndex) {
         stringFromArray = IntArrayToString(charIndexArray);
-        encryptedString = crypt_r(stringFromArray.c_str(), salt.c_str(), data);
+        encryptedString = crypt_r(stringFromArray.c_str(), salt.c_str(), &data);
 
         if (encryptedString == encryptedPassword) {
             return stringFromArray;
