@@ -9,6 +9,8 @@
 #include <thread>
 #include <string.h>
 #include <cassert>
+// #include <mutex>
+#include <vector>
 
 using namespace std;
 
@@ -19,6 +21,7 @@ const int MAX_CHARACTERS = 6;
 
 class SearchSpaceT {
     public:
+        SearchSpaceT(int start, int end);
         string BruteForcePassword();
     private:
         int startCharIndex;
@@ -29,7 +32,31 @@ int GetCmdLineArgs(int argc, char * argv[]);
 string IntArrayToString(int indexArray[]);
 
 int main(int argc, char * argv[]) {
+    vector<thread> threads;
     int n = GetCmdLineArgs(argc, argv);
+    int searchSize = 26 / n;
+    int searchBegin = 0;
+    int searchEnd = searchSize;
+    SearchSpaceT searchSpace(searchBegin, searchEnd);
+
+    // make threads
+    for (int i = 0; i < n; i++) {
+        thread t(&SearchSpaceT::BruteForcePassword, searchSpace); 
+        threads.push_back(move(t));
+
+        // make new search space
+        searchBegin = searchEnd + 1;
+        if (searchBegin + searchSize < 26) {
+            searchEnd = searchBegin + searchSize;
+        } else {
+            searchEnd = 25;
+        }
+        searchSpace = SearchSpaceT(searchBegin, searchEnd);
+    }
+
+    for (int i = 0; i < n; i++) {
+       threads[i].join();
+    }
 
     return 0;
 }
@@ -53,12 +80,19 @@ string IntArrayToString(int indexArray[]) {
     return builtString;
 }
 
+SearchSpaceT::SearchSpaceT(int start, int end) {
+    startCharIndex = start;
+    endCharIndex = end;
+
+    return;
+}
+
 string SearchSpaceT::BruteForcePassword() {
     int charIndexArray[MAX_CHARACTERS] = {startCharIndex, 0, 0, 0, 0, 0};
     string stringFromArray;
     string encryptedString;
     string salt = "DB";
-    int start = startCharIndex;
+    // int start = startCharIndex;
     crypt_data data;
     int i = MAX_CHARACTERS - 1;
     bool incremented;

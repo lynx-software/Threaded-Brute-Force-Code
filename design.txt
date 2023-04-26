@@ -34,3 +34,14 @@ while increment = true and i < length of array:
   if array[i] != last possible character:
 	search = false
   i++
+
+Allocate search space:
+searchsize = length of character set / n
+searchbegin = 0
+searchend = searchsize
+for each thread:
+	searchbegin = searchend + 1
+	if searchbegin + searchsize < size of character set:
+		searchend = searchbegin + searchsize
+	else:
+		searchend = length of character set - 1
