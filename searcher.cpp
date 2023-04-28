@@ -25,6 +25,8 @@ const int MAX_CHARACTERS = 5;
 // every thread needs access to result so that all threads will stop when the solution is found
 string result = "";
 
+using namespace std;
+
 // I tried to put SearchSpaceT in a seperate file but it just made things worse
 class SearchSpaceT {
     public:
