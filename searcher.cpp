@@ -76,6 +76,7 @@ int main(int argc, char * argv[]) {
 int GetCmdLineArgs(int argc, char * argv[]) {
     if (argc == 3 and !strcmp(argv[1], "-N")) {
         assert("Invalid command line argument given" && atoi(argv[2]) >= 1);
+        assert("Maximum number of threads exceeded" && atoi(argv[2]) < CHARS_IN_SET);
         return atoi(argv[2]);
     }
     cout << "Use command line argument -N <integer> to specify number of processes to create" << endl;
