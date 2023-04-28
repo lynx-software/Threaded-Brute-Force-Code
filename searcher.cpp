@@ -6,12 +6,13 @@
 
 #include <iostream>
 #include <thread>
-#include <string.h>
+#include <string>
 #include <cassert>
 #include <vector>
 #include <fstream>
 #include <iomanip>
 #include <crypt.h>
+#include <cstring>
 
 #include "ClockT.h"
 
@@ -47,24 +48,33 @@ int main(int argc, char * argv[]) {
     vector<thread> threads;
     int n = GetCmdLineArgs(argc, argv);
     int searchSize = CHARS_IN_SET / n;
+    int remainder = CHARS_IN_SET % n;
     int searchBegin = 0;
-    int searchEnd = searchSize;
+    int searchEnd = searchSize - 1;
     ClockT clock;
 
     clock.StartClock();
     // make threads
     for (int i = 0; i < n; i++) {
+        // make new search space
+        if (i != 0) {
+            searchBegin = searchEnd + 1;
+            if (searchBegin + searchSize < CHARS_IN_SET - 1) {
+                if (remainder > 0) {
+                    searchSize = (CHARS_IN_SET / n) + 1;
+                    remainder--;
+                } else {
+                    searchSize = CHARS_IN_SET / n;
+                }
+                searchEnd = searchBegin + searchSize - 1;
+            } else {
+                searchEnd = CHARS_IN_SET - 1;
+            }
+        }
+
         SearchSpaceT searchSpace = SearchSpaceT(searchBegin, searchEnd);
         thread t(&SearchSpaceT::BruteForcePassword, searchSpace); 
         threads.push_back(move(t));
-
-        // make new search space
-        searchBegin = searchEnd + 1;
-        if (searchBegin + searchSize < CHARS_IN_SET) {
-            searchEnd = searchBegin + searchSize;
-        } else {
-            searchEnd = CHARS_IN_SET - 1;
-        }
     }
 
     for (int i = 0; i < n; i++) {
@@ -97,8 +107,15 @@ string IntArrayToString(int indexArray[]) {
 }
 
 SearchSpaceT::SearchSpaceT(int start, int end) {
+    assert(start < end);
+    assert(start >= 0);
+
     startCharIndex = start;
     endCharIndex = end;
+
+    if (DEBUG_MODE) {
+        cout <<"start = " << start << "\t end = " << end << endl;
+    }
 
     return;
 }
@@ -121,9 +138,6 @@ void SearchSpaceT::BruteForcePassword() {
         stringFromArray = IntArrayToString(charIndexArray);
         crypt_r(stringFromArray.c_str(), SALT.c_str(), &data);
         encryptedString = data.output;
-        if (DEBUG_MODE) {
-            cout << "stringFromArray = " << stringFromArray << "\tencryptedString = " << encryptedString << endl;
-        }
 
         if (encryptedString == encryptedPassword) {
             // result_mutex.lock();
@@ -176,5 +190,4 @@ void WriteResultToFile(long int time) {
 
     outFile.close();
     return;
-
 }
