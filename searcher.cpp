@@ -41,20 +41,33 @@ class SearchSpaceT {
 };
 
 int GetCmdLineArgs(int argc, char * argv[]);
+void MakeThreads(int n, vector<thread> &threads);
 string IntArrayToString(int indexArray[]);
 void WriteResultToFile(long int time);
 
 int main(int argc, char * argv[]) {
     vector<thread> threads;
     int n = GetCmdLineArgs(argc, argv);
+    ClockT clock;
+
+    clock.StartClock();
+    MakeThreads(n, threads);
+
+    for (int i = 0; i < n; i++) {
+       threads[i].join();
+    }
+
+    WriteResultToFile(clock.EndClock());
+
+    return 0;
+}
+
+void MakeThreads(int n, vector<thread> & threads) {
     int searchSize = CHARS_IN_SET / n;
     int remainder = CHARS_IN_SET % n;
     int searchBegin = 0;
     int searchEnd = searchSize - 1;
-    ClockT clock;
 
-    clock.StartClock();
-    // make threads
     for (int i = 0; i < n; i++) {
         // make new search space
         if (i != 0) {
@@ -76,14 +89,7 @@ int main(int argc, char * argv[]) {
         thread t(&SearchSpaceT::BruteForcePassword, searchSpace); 
         threads.push_back(move(t));
     }
-
-    for (int i = 0; i < n; i++) {
-       threads[i].join();
-    }
-
-    WriteResultToFile(clock.EndClock());
-
-    return 0;
+    return;
 }
 
 int GetCmdLineArgs(int argc, char * argv[]) {
@@ -114,7 +120,7 @@ SearchSpaceT::SearchSpaceT(int start, int end) {
     endCharIndex = end;
 
     if (DEBUG_MODE) {
-        cout <<"start = " << start << "\t end = " << end << endl;
+        cout << "start = " << start << "\t end = " << end << endl;
     }
 
     return;
