@@ -5,7 +5,6 @@
 */
 
 #include <iostream>
-#include <crypt.h> // encryption
 #include <thread>
 #include <string.h>
 #include <cassert>
@@ -14,8 +13,6 @@
 #include <iomanip>
 
 #include "ClockT.h"
-
-using namespace std;
 
 const bool DEBUG_MODE = true;
 // const string encryptedPassword = "DBtH8T8yNcN0U";
