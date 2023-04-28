@@ -9,10 +9,11 @@
 #include <thread>
 #include <string.h>
 #include <cassert>
-// #include <mutex>
 #include <vector>
 #include <fstream>
-// #include <sys/times.h>
+#include <iomanip>
+
+#include "ClockT.h"
 
 using namespace std;
 
@@ -24,9 +25,10 @@ const char CHARACTER_SET[CHARS_IN_SET] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
 // const int MAX_CHARACTERS = 6;
 const int MAX_CHARACTERS = 5;
 
+// every thread needs access to result so that all threads will stop when the solution is found
 string result = "";
-// mutex result_mutex;
 
+// I tried to put SearchSpaceT in a seperate file but it just made things worse
 class SearchSpaceT {
     public:
         SearchSpaceT(int start, int end);
@@ -37,16 +39,9 @@ class SearchSpaceT {
         int endCharIndex;
 };
 
-// class ClockT {
-//     public:
-//         ClockT();
-//         ~ClockT();
-//     private:
-// };
-
 int GetCmdLineArgs(int argc, char * argv[]);
 string IntArrayToString(int indexArray[]);
-void WriteResultToFile();
+void WriteResultToFile(long int time);
 
 int main(int argc, char * argv[]) {
     vector<thread> threads;
@@ -54,10 +49,12 @@ int main(int argc, char * argv[]) {
     int searchSize = CHARS_IN_SET / n;
     int searchBegin = 0;
     int searchEnd = searchSize;
-    SearchSpaceT searchSpace(searchBegin, searchEnd);
+    ClockT clock;
 
+    clock.StartClock();
     // make threads
     for (int i = 0; i < n; i++) {
+        SearchSpaceT searchSpace = SearchSpaceT(searchBegin, searchEnd);
         thread t(&SearchSpaceT::BruteForcePassword, searchSpace); 
         threads.push_back(move(t));
 
@@ -68,14 +65,13 @@ int main(int argc, char * argv[]) {
         } else {
             searchEnd = CHARS_IN_SET - 1;
         }
-        searchSpace = SearchSpaceT(searchBegin, searchEnd);
     }
 
     for (int i = 0; i < n; i++) {
        threads[i].join();
     }
 
-    WriteResultToFile();
+    WriteResultToFile(clock.EndClock());
 
     return 0;
 }
@@ -164,16 +160,20 @@ void SearchSpaceT::IncrementArray(int (&array)[MAX_CHARACTERS]) {
     return;
 }
 
-void WriteResultToFile() {
+void WriteResultToFile(long int time) {
     assert(result != "");
 
     ofstream outFile("output.txt");
+    float minutes = static_cast<float>(time) / 60;
 
     if (DEBUG_MODE) {
         cout << "--- RESULT: " << result << " ---" << endl;
     }
-    outFile << result << '\n';
+    outFile << result << '\n'
+            << "Time taken in seconds: " << time << '\n'
+            << "Time taken in minutes: " << setprecision(2) << minutes << endl;
 
     outFile.close();
     return;
+
 }
